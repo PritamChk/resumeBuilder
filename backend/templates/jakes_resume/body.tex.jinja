@@ -1,0 +1,96 @@
+\begin{document}
+
+\begin{center}
+    {\Huge \scshape << data.name >>} \\ \vspace{1pt}
+    << data.location >> $|$ << data.phone >> \\ \vspace{1pt}
+    \small \href{mailto:<< data.email >>}{\raisebox{-0.2\height}\faEnvelope\ \underline{<< data.email >>}} ~
+    \href{<< data.linkedin >>}{\raisebox{-0.2\height}\faLinkedin\ \underline{linkedin.com/in/<<data.linkedin.split("/")[-1]>>}} ~
+    \href{<< data.github >>}{\raisebox{-0.2\height}\faGithub\ \underline{github.com/<<data.github.split("/")[-1]>>}}
+    \vspace{-8pt}
+\end{center}
+
+%-----------SUMMARY-----------
+\section{Summary}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     {<< data.summary >>}
+    }}
+ \end{itemize}
+ \vspace{-15pt}
+
+%-----------EXPERIENCE-----------
+<% if data.experience %>
+\section{Experience}
+  \resumeSubHeadingListStart
+<% for exp in data.experience %>
+    \resumeSubheading
+      {<< exp.company >>}{<< exp.date >>}
+      {<< exp.title >>}{<< exp.location >>}
+      <% set ns = namespace(has_bullets=false) %>
+      <% for bullet in exp.bullets %><% if bullet.strip() %><% set ns.has_bullets = true %><% endif %><% endfor %>
+      <% if ns.has_bullets %>
+      \resumeItemListStart
+        <% for bullet in exp.bullets %>
+        <% if bullet.strip() %>
+        \resumeItem{<< bullet >>}
+        <% endif %>
+        <% endfor %>
+      \resumeItemListEnd
+      <% endif %>
+<% endfor %>
+  \resumeSubHeadingListEnd
+\vspace{-16pt}
+<% endif %>
+
+%-----------PROJECTS-----------
+<% if data.projects %>
+\section{Projects}
+    \vspace{-5pt}
+    \resumeSubHeadingListStart
+<% for proj in data.projects %>
+      \resumeProjectHeading
+          {\textbf{<< proj.name >>} $|$ \emph{<< proj.tech_stack >>}}{<< proj.date >>}
+          <% set ns2 = namespace(has_bullets=false) %>
+          <% for bullet in proj.bullets %><% if bullet.strip() %><% set ns2.has_bullets = true %><% endif %><% endfor %>
+          <% if ns2.has_bullets %>
+          \resumeItemListStart
+            <% for bullet in proj.bullets %>
+            <% if bullet.strip() %>
+            \resumeItem{<< bullet >>}
+            <% endif %>
+            <% endfor %>
+          \resumeItemListEnd
+          <% endif %>
+          \vspace{-13pt}
+<% endfor %>
+    \resumeSubHeadingListEnd
+\vspace{-15pt}
+<% endif %>
+
+%-----------TECHNICAL SKILLS-----------
+<% if data.skills %>
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+<% for skill in data.skills %>
+     \textbf{<< skill.category >>}{: << skill.skills >>} \\
+<% endfor %>
+    }}
+ \end{itemize}
+ \vspace{-16pt}
+<% endif %>
+
+%-----------EDUCATION-----------
+<% if data.education %>
+\section{Education}
+  \resumeSubHeadingListStart
+<% for edu in data.education %>
+    \resumeSubheading
+      {<< edu.institution >>}{<< edu.date >>}
+      {<< edu.degree >>}{<< edu.location >>}
+<% endfor %>
+  \resumeSubHeadingListEnd
+\vspace{-12pt}
+<% endif %>
+
+\end{document}
