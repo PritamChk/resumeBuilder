@@ -2,6 +2,16 @@
 
 A full-stack, agent-based resume builder application that allows users to create ATS-optimized resumes using a sleek, interactive multi-step form. The application provides a live preview and generates a compiled PDF using a LaTeX template.
 
+## 📸 Visual Showcase
+
+| Personal Information | Professional Experience |
+| :---: | :---: |
+| ![Personal Info Interface](./docs/images/dashboard_personal.png) | ![Experience Interface](./docs/images/dashboard_experience.png) |
+
+| Professional Summary | Live Preview & Compilation |
+| :---: | :---: |
+| ![Summary Interface](./docs/images/dashboard_summary.png) | _The right pane shows the real-time rendered PDF_ |
+
 ---
 
 ## 🚀 Quick Start
