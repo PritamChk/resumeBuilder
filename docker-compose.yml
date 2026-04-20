@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: resume-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - TECTONIC_CACHE_DIR=/tmp/tectonic_cache
+      - DATABASE_URL=sqlite:////app/data/resume_builder.db
+    volumes:
+      - backend-data:/app/data
+      - tectonic-cache:/tmp/tectonic_cache
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:8000
+    container_name: resume-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  backend-data:
+  tectonic-cache:

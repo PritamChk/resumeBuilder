@@ -27,6 +27,31 @@ That's it! The script will:
 
 Open `http://localhost:3000` in your browser and start building!
 
+## 🐳 The Docker Way (Optimized)
+
+The most professional and isolated way to run the full stack is using Docker Compose. This uses optimized multi-stage builds and handles service orchestration automatically.
+
+### Commands
+
+```bash
+# Build and start the services in the background
+docker-compose up --build -d
+
+# View live logs
+docker-compose logs -f
+
+# Stop and remove containers
+docker-compose down
+```
+
+### Why this is better:
+- **Zero Configuration**: No need to install Node.js, Python, or Tectonic locally.
+- **Persistence**: Your database and LaTeX cache are stored in Docker volumes.
+- **Optimized Size**: Uses Next.js `standalone` mode and slim Python images.
+- **Isolation**: Keeps your host machine clean from project dependencies.
+
+---
+
 ---
 
 ## Project Structure

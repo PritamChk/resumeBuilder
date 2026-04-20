@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+venv/
+.venv/
+env/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local data & binaries
+*.db
+*.pdf
+backend/tectonic.exe
+backend/venv/
+
+# Environment and logs
+.env*
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Git
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
