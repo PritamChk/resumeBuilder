@@ -20,7 +20,13 @@ Start-Sleep -Seconds 2
 # Start Backend in a new terminal window
 Write-Host "Starting Backend (FastAPI on port 8000)..." -ForegroundColor Cyan
 $backendPath = Join-Path $projectRoot "backend"
-$backendCmd = "cd `"$backendPath`"; pip install -q -r requirements.txt; uvicorn main:app --reload --port 8000"
+$backendCmd = @"
+cd `"$backendPath`"
+if (-not (Test-Path 'venv')) { python -m venv venv }
+.\venv\Scripts\Activate.ps1
+pip install -q -r requirements.txt
+uvicorn main:app --reload --port 8000
+"@
 Start-Process powershell -ArgumentList "-NoExit", "-Command", $backendCmd
 Start-Sleep -Seconds 2
 
