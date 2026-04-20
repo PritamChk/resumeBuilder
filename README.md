@@ -2,6 +2,33 @@
 
 A full-stack, agent-based resume builder application that allows users to create ATS-optimized resumes using a sleek, interactive multi-step form. The application provides a live preview and generates a compiled PDF using a LaTeX template.
 
+---
+
+## 🚀 Quick Start
+
+The fastest way to get everything running:
+
+### Windows (PowerShell)
+
+```powershell
+# Start both backend and frontend
+.\start.ps1
+
+# Later, to stop:
+.\stop.ps1
+```
+
+That's it! The script will:
+
+- ✅ Clear any existing processes on ports 8000 and 3000
+- ✅ Install dependencies (first run)
+- ✅ Start the backend (FastAPI) on `http://localhost:8000`
+- ✅ Start the frontend (Next.js) on `http://localhost:3000`
+
+Open `http://localhost:3000` in your browser and start building!
+
+---
+
 ## Project Structure
 
 This project is divided into two main components:
@@ -17,7 +44,7 @@ This project is divided into two main components:
 - **Live Preview**: See your resume update in real-time as you type, with a 1.5-second debounce.
 - **LaTeX Generation**: The backend uses Jinja2 to dynamically inject data into an ATS-optimized LaTeX template (based on Jake's Resume).
 - **Local PDF Compilation**: Uses the Tectonic typesetting engine to rapidly compile LaTeX into PDF without external dependencies.
-- **Export Options**: 
+- **Export Options**:
   - Download the final compiled PDF.
   - Copy the raw LaTeX source code directly to your clipboard.
 - **Theming**: Features a stunning dark mode interface with crimson red accents and glassmorphic elements.
@@ -32,7 +59,7 @@ Before running the application, ensure you have the following installed:
 - **Python** (v3.13 tested, 3.10+ recommended)
 - **npm** or **yarn**
 
-*(Note: The backend includes the standalone `tectonic.exe` binary for LaTeX compilation on Windows, so a full TeX Live installation is not required.)*
+_(Note: The backend includes the standalone `tectonic.exe` binary for LaTeX compilation on Windows, so a full TeX Live installation is not required.)_
 
 ---
 
@@ -61,7 +88,8 @@ Run the backend server:
 uvicorn main:app --reload
 ```
 
-The API will be available at `http://127.0.0.1:8000`. 
+The API will be available at `http://127.0.0.1:8000`.
+
 - Interactive API documentation (Swagger) is available at `http://127.0.0.1:8000/docs`.
 
 ### 2. Frontend Setup (Next.js)

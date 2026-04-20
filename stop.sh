@@ -1,27 +1,37 @@
 #!/bin/bash
+# Resume Builder - Stop Script (Shell)
+# Stops all running services based on README
 
-# Resume Builder - Stop Script
-# Stops all running services
+echo -e "\033[33mStopping Resume Builder...\033[0m"
+echo ""
 
-echo "🛑 Stopping Resume Builder..."
+STOPPED=false
 
-# Kill processes on specific ports
-# Backend on 8000
-if lsof -Pi :8000 -sTCP:LISTEN -t > /dev/null ; then
-    echo "Stopping backend on port 8000..."
-    kill -9 $(lsof -Pi :8000 -sTCP:LISTEN -t) 2>/dev/null || true
-    echo "✓ Backend stopped"
+# Kill all Node.js processes (Frontend)
+echo -e "\033[36mStopping Node.js (Frontend)...\033[0m"
+if pkill -f "node" 2>/dev/null; then
+    echo -e "\033[32mNode.js stopped\033[0m"
+    STOPPED=true
+else
+    echo -e "\033[90mNo Node.js processes found\033[0m"
 fi
 
-# Frontend on 3000
-if lsof -Pi :3000 -sTCP:LISTEN -t > /dev/null ; then
-    echo "Stopping frontend on port 3000..."
-    kill -9 $(lsof -Pi :3000 -sTCP:LISTEN -t) 2>/dev/null || true
-    echo "✓ Frontend stopped"
+echo ""
+
+# Kill all Python processes (Backend)
+echo -e "\033[36mStopping Python (Backend)...\033[0m"
+if pkill -f "python" 2>/dev/null; then
+    echo -e "\033[32mPython stopped\033[0m"
+    STOPPED=true
+else
+    echo -e "\033[90mNo Python processes found\033[0m"
 fi
 
-# Kill any remaining node and python processes
-pkill -f "next dev" 2>/dev/null || true
-pkill -f "uvicorn" 2>/dev/null || true
-
-echo "✓ All services stopped"
+echo ""
+if [ "$STOPPED" = true ]; then
+    echo -e "\033[32m✓ Resume Builder stopped successfully\033[0m"
+    echo -e "\033[32mRun './start.sh' to start again\033[0m"
+else
+    echo -e "\033[90mNo services were running\033[0m"
+fi
+echo ""
