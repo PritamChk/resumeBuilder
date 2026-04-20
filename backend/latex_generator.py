@@ -40,15 +40,31 @@ def escape_latex(s: str) -> str:
 latex_jinja_env.filters['escape_latex'] = escape_latex
 
 
+def _sanitize(d):
+    """Recursively convert None to empty string so templates never see None."""
+    if d is None:
+        return ""
+    elif isinstance(d, str):
+        return d
+    elif isinstance(d, list):
+        return [_sanitize(i) for i in d]
+    elif isinstance(d, dict):
+        return {k: _sanitize(v) for k, v in d.items()}
+    return d
+
+
 def generate_latex_source(data: dict, template_name: str = 'jakes_resume') -> str:
     """Combines header and body to generate full LaTeX source."""
-    
+
     # Load Header (static latex)
     header_path = os.path.join(os.path.dirname(__file__), 'templates', template_name, 'header.tex')
     with open(header_path, 'r', encoding='utf-8') as f:
         header_content = f.read()
 
-    # Apply escaping recursively to the data
+    # 1. Sanitize: replace None with '' so templates are None-safe
+    clean_data = _sanitize(data)
+
+    # 2. Escape LaTeX special characters
     def recursive_escape(d):
         if isinstance(d, str):
             return escape_latex(d)
@@ -58,10 +74,9 @@ def generate_latex_source(data: dict, template_name: str = 'jakes_resume') -> st
             return {k: recursive_escape(v) for k, v in d.items()}
         return d
 
-    # Create a copy so we don't modify the original state
-    safe_data = recursive_escape(data)
+    safe_data = recursive_escape(clean_data)
 
-    # Render Body
+    # 3. Render Body
     template = latex_jinja_env.get_template(f'{template_name}/body.tex.jinja')
     body_content = template.render(data=safe_data)
 

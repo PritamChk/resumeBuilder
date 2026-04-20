@@ -1,15 +1,23 @@
 \begin{document}
 
 \begin{center}
-    {\Huge \scshape << data.name >>} \\ \vspace{1pt}
-    << data.location >> $|$ << data.phone >> \\ \vspace{1pt}
-    \small \href{mailto:<< data.email >>}{\raisebox{-0.2\height}\faEnvelope\ \underline{<< data.email >>}} ~
-    \href{<< data.linkedin >>}{\raisebox{-0.2\height}\faLinkedin\ \underline{linkedin.com/in/<<data.linkedin.split("/")[-1]>>}} ~
-    \href{<< data.github >>}{\raisebox{-0.2\height}\faGithub\ \underline{github.com/<<data.github.split("/")[-1]>>}}
+    {\Huge \scshape << data.name | default('') >>} \\ \vspace{1pt}
+    << data.location | default('') >> $|$ << data.phone | default('') >> \\ \vspace{1pt}
+    \small
+    <% if data.email %>
+    \href{mailto:<< data.email >>}{\raisebox{-0.2\height}\faEnvelope\ \underline{<< data.email >>}}
+    <% endif %>
+    <% if data.linkedin %>
+    ~\href{<< data.linkedin >>}{\raisebox{-0.2\height}\faLinkedin\ \underline{linkedin.com/in/<<data.linkedin.rstrip('/').split('/')[-1]>>}}
+    <% endif %>
+    <% if data.github %>
+    ~\href{<< data.github >>}{\raisebox{-0.2\height}\faGithub\ \underline{github.com/<<data.github.rstrip('/').split('/')[-1]>>}}
+    <% endif %>
     \vspace{-8pt}
 \end{center}
 
 %-----------SUMMARY-----------
+<% if data.summary and data.summary.strip() %>
 \section{Summary}
  \begin{itemize}[leftmargin=0.15in, label={}]
     \small{\item{
@@ -17,6 +25,7 @@
     }}
  \end{itemize}
  \vspace{-15pt}
+<% endif %>
 
 %-----------EXPERIENCE-----------
 <% if data.experience %>
