@@ -1,37 +1,37 @@
-from typing import List, Optional
-from pydantic import BaseModel
+from typing import List
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 
 class ExperienceItem(BaseModel):
-    company: str
-    title: str
-    location: str
-    date: str
+    company: str = Field(..., min_length=1, max_length=100)
+    title: str = Field(..., min_length=1, max_length=100)
+    location: str = Field(..., max_length=100)
+    date: str = Field(..., max_length=50)
     bullets: List[str]
 
 class ProjectItem(BaseModel):
-    name: str
-    tech_stack: str
-    date: str
+    name: str = Field(..., min_length=1, max_length=100)
+    tech_stack: str = Field(..., max_length=200)
+    date: str = Field(..., max_length=50)
     bullets: List[str]
 
 class EducationItem(BaseModel):
-    institution: str
-    degree: str
-    location: str
-    date: str
+    institution: str = Field(..., min_length=1, max_length=100)
+    degree: str = Field(..., max_length=100)
+    location: str = Field(..., max_length=100)
+    date: str = Field(..., max_length=50)
 
 class SkillsItem(BaseModel):
-    category: str
-    skills: str
+    category: str = Field(..., max_length=100)
+    skills: str = Field(..., max_length=500)
 
 class ResumeBase(BaseModel):
-    name: str
-    email: str
-    phone: str
-    linkedin: str
-    github: str
-    location: str
-    summary: str
+    name: str = Field(..., min_length=1, max_length=100)
+    email: EmailStr
+    phone: str = Field(..., pattern=r"^\+?[\d\s\-\(\).]+$", max_length=20)
+    linkedin: str = Field(..., max_length=200)
+    github: str = Field(..., max_length=200)
+    location: str = Field(..., max_length=100)
+    summary: str = Field(..., max_length=2000)
     experience: List[ExperienceItem]
     projects: List[ProjectItem]
     skills: List[SkillsItem]

@@ -4,7 +4,9 @@ import { useState, useEffect, forwardRef, useRef } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
-import { Plus, Trash2, FileText, Download, Copy, Check } from "lucide-react";
+import { Plus, Trash2, FileText, Download, Copy, Check, Zap, ZapOff } from "lucide-react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Types
 type FormValues = {
@@ -24,7 +26,7 @@ type FormValues = {
 const defaultValues: FormValues = {
   name: "PRITAM CHAKRABORTY",
   email: "pritamchakraborty2017@gmail.com",
-  phone: "(+91) 9836424024",
+  phone: "9836424024",
   linkedin: "https://www.linkedin.com/in/pritam98",
   github: "https://github.com/PritamChk",
   location: "Bangalore, India",
@@ -73,6 +75,7 @@ export default function ResumeBuilder() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [autoPreview, setAutoPreview] = useState(true);
   const requestIdRef = useRef(0);
   const currentBlobUrlRef = useRef<string | null>(null);
 
@@ -99,7 +102,7 @@ export default function ResumeBuilder() {
         }))
       };
       
-      const res = await axios.post("http://localhost:8000/api/generate-pdf", cleanedValues, {
+      const res = await axios.post(`${API_URL}/api/generate-pdf`, cleanedValues, {
         responseType: "blob",
       });
 
@@ -116,7 +119,7 @@ export default function ResumeBuilder() {
     } catch (error) {
       // Only update if this is still the latest request
       if (currentRequestId === requestIdRef.current) {
-        setError("Failed to generate PDF. Make sure:\n1. Backend is running on localhost:8000\n2. LaTeX/Tectonic binary is available\n3. All required fields are filled");
+        setError(`Failed to generate PDF. Make sure:\n1. Backend is running on ${API_URL}\n2. LaTeX/Tectonic binary is available\n3. All required fields are filled`);
         console.error("PDF Generation failed", error);
       }
     } finally {
@@ -140,11 +143,12 @@ export default function ResumeBuilder() {
   }, []); // On mount
 
   useEffect(() => {
+    if (!autoPreview) return;
     const timer = setTimeout(() => {
       handleGeneratePreview();
-    }, 1500);
+    }, 3000); // Increased debounce to 3 seconds
     return () => clearTimeout(timer);
-  }, [formJson]); // On changes
+  }, [formJson, autoPreview]); // On changes
 
   const tabs = ["Personal", "Summary", "Experience", "Projects", "Skills", "Education"];
 
@@ -199,7 +203,7 @@ export default function ResumeBuilder() {
             <button
               onClick={async () => {
                 try {
-                  const res = await axios.post("http://localhost:8000/api/generate-latex", formValues);
+                  const res = await axios.post(`${API_URL}/api/generate-latex`, formValues);
                   await navigator.clipboard.writeText(res.data);
                   setIsCopied(true);
                   setTimeout(() => setIsCopied(false), 2000);
@@ -225,6 +229,20 @@ export default function ResumeBuilder() {
                 <Download className="w-4 h-4" /> PDF
               </a>
             )}
+
+            {/* Auto-Refresh Toggle */}
+            <button
+              onClick={() => setAutoPreview(!autoPreview)}
+              title={autoPreview ? "Disable Auto-Refresh" : "Enable Auto-Refresh"}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all border ${
+                autoPreview 
+                  ? "text-primary border-primary/30 bg-primary/5 hover:bg-primary/10" 
+                  : "text-gray-400 border-white/10 hover:border-white/30"
+              }`}
+            >
+              {autoPreview ? <Zap className="w-4 h-4" /> : <ZapOff className="w-4 h-4" />}
+              Auto
+            </button>
 
             {/* Force Refresh */}
             <button

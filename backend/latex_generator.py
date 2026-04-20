@@ -1,4 +1,5 @@
 import os
+import subprocess
 import jinja2
 import requests
 import re
@@ -19,21 +20,25 @@ latex_jinja_env = jinja2.Environment(
 )
 
 def escape_latex(s: str) -> str:
-    """Escape specific LaTeX special characters to prevent compilation errors."""
+    """Escape LaTeX special characters to prevent compilation errors and injection."""
     if not isinstance(s, str):
-         return s
+        return s
     
-    # Simple escaping, add more if needed.
-    # Note: ampersands, hashes, dollar signs, percent signs, underscores are common.
-    # But some users might *want* literal LaTeX. We'll do basic escaping for user data.
-    # Actually, escaping in a fully dynamic resume might break user's intent if they typeset
-    # things like \textbf{C#}. So we will keep it simple.
-    s = s.replace('&', '\\&')
-    s = s.replace('%', '\\%')
-    s = s.replace('$', '\\$')
-    s = s.replace('#', '\\#')
-    s = s.replace('_', '\\_')
-    # Use textasciitilde for ~ and textasciicircum for ^ but those are rare.
+    # Escape ALL LaTeX special chars
+    replacements = {
+        '\\': r'\textbackslash{}',
+        '{': r'\{',
+        '}': r'\}',
+        '&': r'\&',
+        '%': r'\%',
+        '$': r'\$',
+        '#': r'\#',
+        '_': r'\_',
+        '~': r'\textasciitilde{}',
+        '^': r'\textasciicircum{}',
+    }
+    for char, escape in replacements.items():
+        s = s.replace(char, escape)
     return s
 
 # Register custom filter
@@ -56,8 +61,19 @@ def _sanitize(d):
 def generate_latex_source(data: dict, template_name: str = 'jakes_resume') -> str:
     """Combines header and body to generate full LaTeX source."""
 
+    # Whitelist allowed templates and prevent path traversal
+    if not re.match(r'^[a-z_]+$', template_name):
+        raise ValueError("Invalid template name")
+    
+    allowed_templates = ['jakes_resume'] # Update this list as more are added
+    if template_name not in allowed_templates:
+        raise ValueError(f"Template '{template_name}' not allowed")
+
     # Load Header (static latex)
     header_path = os.path.join(os.path.dirname(__file__), 'templates', template_name, 'header.tex')
+    if not os.path.abspath(header_path).startswith(os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))):
+        raise ValueError("Access denied to template path")
+
     with open(header_path, 'r', encoding='utf-8') as f:
         header_content = f.read()
 
@@ -82,7 +98,22 @@ def generate_latex_source(data: dict, template_name: str = 'jakes_resume') -> st
 
     return header_content + "\n" + body_content
 
-import subprocess
+import platform
+import shutil
+import logging
+
+logger = logging.getLogger(__name__)
+
+def get_tectonic_path():
+    exe_name = "tectonic.exe" if platform.system() == "Windows" else "tectonic"
+    local_path = os.path.join(os.path.dirname(__file__), exe_name)
+    if os.path.exists(local_path):
+        return local_path
+    # Fallback to system PATH
+    system_path = shutil.which("tectonic")
+    if system_path:
+        return system_path
+    raise FileNotFoundError("Tectonic binary not found. Install with: cargo install tectonic")
 
 def compile_pdf_local(latex_source: str) -> bytes:
     """
@@ -97,12 +128,14 @@ def compile_pdf_local(latex_source: str) -> bytes:
         with open(tex_path, "w", encoding="utf-8") as f:
             f.write(latex_source)
             
-        tectonic_exe = os.path.join(os.path.dirname(__file__), "tectonic.exe")
-        
         try:
+            tectonic_exe = get_tectonic_path()
             subprocess.run([tectonic_exe, tex_path], check=True, capture_output=True, cwd=tmpdir)
             with open(pdf_path, "rb") as f:
                 return f.read()
         except subprocess.CalledProcessError as e:
-            error_msg = e.stderr.decode('utf-8', errors='ignore') if e.stderr else str(e)
-            raise Exception(f"LaTeX compilation failed: {error_msg}")
+            logger.error(f"LaTeX compilation failed: {e.stderr.decode('utf-8', errors='ignore')}")
+            raise Exception("Failed to compile resume. Check your input for special characters.")
+        except Exception as e:
+            logger.error(f"Error during PDF compilation: {str(e)}")
+            raise Exception("An unexpected error occurred during PDF generation.")

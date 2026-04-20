@@ -4,8 +4,12 @@ from sqlalchemy.orm import sessionmaker
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./resume_builder.db"
 
+from sqlalchemy.pool import StaticPool
+
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
